@@ -6,7 +6,14 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client(
+	{
+		intents:[
+			GatewayIntentBits.Guilds,
+			GatewayIntentBits.GuildVoiceStates
+		]
+	}
+);
 
 
 client.commands = new Collection();
@@ -39,5 +46,5 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
-client.login(process.env.a1itt1eb0tJS_TOKEN)
+client.login(process.env.TOKEN)
 

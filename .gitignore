@@ -2,6 +2,9 @@
 .env
 config.json
 
+# Log files
+log/
+
 # MacOS file system metadata file
 .DS_Store
 
