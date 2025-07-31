@@ -1,19 +1,24 @@
 const { Events } = require('discord.js');
 
+// File system and path modules for logging to files
 const fs = require('fs');
 const path = require('path');
 
 module.exports = {
     name: Events.VoiceStateUpdate,
     async execute(oldState, newState) {
+        // Extract previous and current voice channel states
         const oldChannel = oldState.channel;
         const newChannel = newState.channel;
         const user = newState.member.user;
         const serverName = newState.guild.name || 'UnknownServer';
+        
+        // Format current time for logging
         const now = new Date();
         const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
         let logEntry = null;
 
+        // Detect voice channel join event
         if (oldChannel === null && newChannel !== null) {
             console.log(`<join> ${user.tag} ${serverName} ${newChannel.name} ${formattedTime}`);
             logEntry = {
@@ -29,6 +34,7 @@ module.exports = {
                     }
                 }
             };
+        // Detect voice channel leave event
         } else if (oldChannel !== null && newChannel === null) {
             console.log(`<leave> ${user.tag} ${serverName} ${oldChannel.name} ${formattedTime}`);
             logEntry = {
@@ -44,6 +50,7 @@ module.exports = {
                     }
                 }
             };
+        // Detect voice channel move event (switching channels)
         } else if (oldChannel !== null && newChannel !== null && oldChannel.id !== newChannel.id) {
             console.log(`<move> ${user.tag} ${serverName} ${oldChannel.name} -> ${newChannel.name} ${formattedTime}`);
             logEntry = {
@@ -67,17 +74,20 @@ module.exports = {
             };
         }
 
+        // If an event was detected, log it to a file
         if (logEntry) {
+            // Create a unique filename based on server and date
             const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
             const year = now.getFullYear();
             const month = months[now.getMonth()];
             const day = String(now.getDate()).padStart(2, '0');
             const serverName = newState.guild.name || 'UnknownServer';
-            const fileName = `${serverName}_${year}_${month}_${day}_voice_channel_log.json`;
+            const fileName = `${serverName}__${year}-${month}-${day}_voice_channel_log.json`;
             const logDir = path.join(__dirname, '..', 'log', 'voice', 'join_leave_move');
             const logFilePath = path.join(logDir, fileName);
             let logData = [];
 
+            // Ensure log directory and file exist, and load existing logs if any
             try {
                 if (!fs.existsSync(logDir)) {
                     fs.mkdirSync(logDir, { recursive: true });
@@ -101,8 +111,10 @@ module.exports = {
                 logData = [];
             }
 
+            // Append new log entry to existing data
             logData.push(logEntry);
 
+            // Write updated log data back to file
             try {
                 fs.writeFileSync(logFilePath, JSON.stringify(logData, null, 2), 'utf8');
             } catch (error) {
