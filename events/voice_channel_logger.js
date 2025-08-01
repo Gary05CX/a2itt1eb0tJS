@@ -23,15 +23,9 @@ module.exports = {
             console.log(`<join> ${user.tag} ${serverName} ${newChannel.name} ${formattedTime}`);
             logEntry = {
                 "Join": {
-                    "User": {
-                        "ID": user.id,
-                        "Name": user.tag
-                    },
+                    "User": user.id,
                     "Time": formattedTime,
-                    "Channel": {
-                        "ID": newChannel.id,
-                        "Name": newChannel.name
-                    }
+                    "Channel": newChannel.id
                 }
             };
         // Detect voice channel leave event
@@ -39,15 +33,9 @@ module.exports = {
             console.log(`<leave> ${user.tag} ${serverName} ${oldChannel.name} ${formattedTime}`);
             logEntry = {
                 "Leave": {
-                    "User": {
-                        "ID": user.id,
-                        "Name": user.tag
-                    },
+                    "User": user.id,
                     "Time": formattedTime,
-                    "Channel": {
-                        "ID": oldChannel.id,
-                        "Name": oldChannel.name
-                    }
+                    "Channel": oldChannel.id
                 }
             };
         // Detect voice channel move event (switching channels)
@@ -55,20 +43,11 @@ module.exports = {
             console.log(`<move> ${user.tag} ${serverName} ${oldChannel.name} -> ${newChannel.name} ${formattedTime}`);
             logEntry = {
                 "Move": {
-                    "User": {
-                        "ID": user.id,
-                        "Name": user.tag
-                    },
+                    "User": user.id,
                     "Time": formattedTime,
                     "Channel": {
-                        "from": {
-                            "id": oldChannel.id,
-                            "name": oldChannel.name
-                        },
-                        "to": {
-                            "id": newChannel.id,
-                            "name": newChannel.name
-                        }
+                        "from": oldChannel.id,
+                        "to": newChannel.id
                     }
                 }
             };
@@ -76,27 +55,35 @@ module.exports = {
 
         // If an event was detected, log it to a file
         if (logEntry) {
-            // Create a unique filename based on server and date
+            // Create a unique filename based on date
             const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
             const year = now.getFullYear();
             const month = months[now.getMonth()];
             const day = String(now.getDate()).padStart(2, '0');
-            const serverName = newState.guild.name || 'UnknownServer';
-            const fileName = `${serverName}__${year}-${month}-${day}_voice_channel_log.json`;
-            const logDir = path.join(__dirname, '..', 'log', 'voice', 'join_leave_move');
-            const logFilePath = path.join(logDir, fileName);
+            const serverID = newState.guild.id || 'UnknownServer';
+            const fileName = `${year}_${month}_${day}.json`;
+            
+            // Create server-specific directory
+            const baseLogDir = path.join(__dirname, '..', 'log', 'voice', 'join_leave_move');
+            const serverLogDir = path.join(baseLogDir, serverID);
+            const logFilePath = path.join(serverLogDir, fileName);
             let logData = [];
 
-            // Ensure log directory and file exist, and load existing logs if any
+            // Ensure log directories and file exist, and load existing logs if any
             try {
-                if (!fs.existsSync(logDir)) {
-                    fs.mkdirSync(logDir, { recursive: true });
-                    console.log('Created log directory:', logDir);
+                if (!fs.existsSync(baseLogDir)) {
+                    fs.mkdirSync(baseLogDir, { recursive: true });
+                    console.log('Created base log directory:', baseLogDir);
+                }
+                
+                if (!fs.existsSync(serverLogDir)) {
+                    fs.mkdirSync(serverLogDir, { recursive: true });
+                    console.log('Created server log directory:', serverLogDir);
                 }
 
                 if (!fs.existsSync(logFilePath)) {
                     fs.writeFileSync(logFilePath, JSON.stringify([], null, 2), 'utf8');
-                    console.log(`Created new log file: ${fileName}`);
+                    console.log(`Created new log file: ${fileName} in server ${serverID}`);
                 } else {
                     const fileContent = fs.readFileSync(logFilePath, 'utf8');
                     if (fileContent) {
