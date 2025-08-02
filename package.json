@@ -6,8 +6,8 @@
   "author": "Gary05CX <86848488+Gary05CX@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5"
+    "discord.js": "^14.21.0",
+    "dotenv": "^16.6.1"
   },
   "devDependencies": {
     "eslint": "^9.12.0"
