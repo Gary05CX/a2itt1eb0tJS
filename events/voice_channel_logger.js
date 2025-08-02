@@ -64,7 +64,7 @@ module.exports = {
             const fileName = `${year}_${month}_${day}.json`;
             
             // Create server-specific directory
-            const baseLogDir = path.join(__dirname, '..', 'log', 'voice', 'join_leave_move');
+            const baseLogDir = path.join(__dirname, '..', 'logs', 'voice', 'join_leave_move');
             const serverLogDir = path.join(baseLogDir, serverID);
             const logFilePath = path.join(serverLogDir, fileName);
             let logData = [];
