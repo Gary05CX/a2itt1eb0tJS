@@ -4,10 +4,20 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "37037:3000"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: node index.js
     environment:
       NODE_ENV: development
+  mongodb:
+    build: 
+      context: .
+      dockerfile: dockerfile-database
+    container_name: MongoDB_Server
+    ports:
+      - 37027:27017
+    volumes:
+      - ./.dbdata/mongodb:/data/db
+      - ./.mongolog:/var/log

@@ -1,0 +1,6 @@
+FROM mongo:latest
+
+EXPOSE 27017/TCP
+
+CMD mongod --bind_ip_all --fork --logpath /var/log/mongodb.log && \
+     /bin/sleep infinity
