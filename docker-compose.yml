@@ -1,23 +1,27 @@
 services:
-  app:
+  bot:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "37037:3000"
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: node index.js
     environment:
-      NODE_ENV: development
-  mongodb:
-    build: 
-      context: .
-      dockerfile: dockerfile-database
-    container_name: MongoDB_Server
+      TOKEN: ${TOKEN}
+      APPLICATION_ID: ${APPLICATION_ID}
+      DATABASE_URL: postgresql://a2itt1eb0t:botadm1n@postgres:5432/a2itt1eb0t?sslmode=disable
+      TIMEZONE: ${TIMEZONE:-UTC}
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: a2itt1eb0t
+      POSTGRES_USER: a2itt1eb0t
+      POSTGRES_PASSWORD: botadm1n
     ports:
-      - 37027:27017
+      - "5432:5432"
     volumes:
-      - ./.dbdata/mongodb:/data/db
-      - ./.mongolog:/var/log
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
