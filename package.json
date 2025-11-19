@@ -8,7 +8,9 @@
   "dependencies": {
     "discord.js": "^14.21.0",
     "dotenv": "^16.6.1",
-    "mongodb": "^6.19.0"
+    "luxon": "^3.7.2",
+    "mongodb": "^6.19.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "eslint": "^9.12.0"
